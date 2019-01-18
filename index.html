@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title> Asteroids</title>
+    <style> </style>
+
+</head>
+
+
+<body>
+    <canvas id="gamecanvas" width="700" height="500"> </canvas>
+    <!-- Creating a game space of canvas type. this Canvas tag is nothing but a container for all the graphics portions of the games,like images,
+        texts etc. The actaul drawing of images and objects is implemented via javascript-->
+
+    <script>
+        //**********************THE GAME JAVASCRIPT BEGINS**********************************************************************************************
+        const FPS = 30;
+
+        const SHIP_SIZE = 30; //ship height in pixels
+        const TURN_SPEED = 360; // TURNSPEED in degrees per second
+        const SHIP_THRUST = 5;   // ACCELERATION of ship in pixels per second(sq)
+        const FRICTION = 0.7 ; //Co efficient of friction (not in the exact physical definition though)
+        const ROIDS_NUM = 3 ;   //the number of asteroids being 3 in the beginning of the game
+        const ROIDS_SIZE = 100;
+        const ROIDS_SPD = 50;
+        //* @type{HTMLCanvasElement}   
+
+        /* NOTE: HTMLCanvasElement is used to provide all the methods and properies of html5 to the canvas elements and manipulate the canvas elements 
+        .HTMLCanvasElement actaully inherits the properites from HTML Element*/
+
+        var canv = document.getElementById("gamecanvas");
+
+        /*NOTE: document.getElementById() function returns the element with the ID attribute "gamecanvas" which is specified as input inside brackets.
+        Now the canv variable has the "gamecanvas" id's reference.i.e it stores the reference to that id.so whnever canv 
+        is used it will point to the "gamecanvas" id.So this 
+        variable canv is of object data type. */
+
+        var ctx = canv.getContext("2d");
+
+        /* NOTE: getContext is a function which returns an object(i.e its reference).this object contains all mehods and properties 
+        for drawing on the canvas.when "2d" is specified , the methods responsible for drawing lines,text,boxes and functions is called.this object which is 
+        being returned is called as renderingcontext*/
+
+
+        var ship =
+        {
+            x: canv.width / 2,
+
+            y: canv.height / 2,
+
+            r: SHIP_SIZE / 2,
+
+            a: 90 / 180 * Math.PI , // convert to radians
+
+            rot: 0,
+
+            thrusting : false ,
+
+            thrust :
+            {
+                x: 0 ,
+                y: 0
+            }
+
+
+        }
+
+        //Setting up of  asteroids
+
+        var roids =[];                   //array of asteroids
+        createAsteroidBelt();
+
+
+
+        //setting up event handlers
+
+        document.addEventListener("keydown",keyDown);     
+        document.addEventListener("keyup",keyUp);
+
+
+        //NOTE: The string in quotes is the event.for ex ,"keydown" is an event in which the user presses a key and "keyup" 
+        //is an event in which the user releases the key.Once the event has happened, the function parametrised is called
+
+
+
+
+        //SET THE GAME LOOP
+
+        setInterval(update, 1000/FPS);
+
+        //*********************      THE ENTIRE STOCK OF ASTEROIDS IS CONTROLLED BY THE FOLLOWING FUNCTION                    *********************************************
+        function createAsteroidBelt()
+        {
+             roids =[];   //emptying the asteroids array
+             var x,y;
+             for ( var i=0 ; i<ROIDS_NUM; i++)
+              {    
+                  x= Math.floor(Math.random() * canv.width);      //NOTE: Math.random() gives a random value between 0 and 1.Math.floor approximates downwards to the nearest integer
+                  y= Math.floor( Math.random()* canv.height);
+                  roids.push(newasteroid(x,y));         /*push is an inbuilt mehod inside every array.
+                                                      it is used to add a new element of the ame data type to the end of the array*/
+
+              }
+
+        }
+
+
+
+        function keyDown( /*keyboard event*/ ev )
+        {  
+             switch(ev.keyCode)
+             { 
+                 case 37:  //left arrow-should rotate the ship left
+                  ship.rot = TURN_SPEED/180 *Math.PI /FPS;
+                 break;
+
+                 case 38:   // up arrow-thrust the ship upward
+
+                 ship.thrusting= true;
+
+    
+                 break;
+
+
+                 case 39:     // right arrow- rotate the ship rightward
+
+                 ship.rot = -TURN_SPEED/180 *Math.PI /FPS;
+
+
+                 break;
+
+
+
+             }
+
+        }
+
+        function keyUp (/*keyboard event*/ ev)
+          {
+            switch(ev.keyCode)
+             { 
+                 case 37:  //left arrow if released should stop the ship
+                  ship.rot = 0;
+                 break;
+
+                 case 38:   // up arrow-thrust the ship upward
+                  
+                  ship.thrusting= false;
+
+                 break;
+
+
+                 case 39:     // right arrow if released should stop the ship 
+
+                 ship.rot = 0;
+
+
+                 break;
+
+
+
+             }
+
+
+
+          }
+
+
+        /*NOTE:  setInterval and setTimeout are two methods of the window object in javascript.However,these methods can be called without 
+           using the window object too. setInterval has a function and the time in milliseconds as its parameters.
+           This function "update" which is passed as argument will be called every 1000/FPS milliseconds when setInterval is used.*/
+
+        //NOTE: setTimeout does the same thing but only once.i.e it calls the argumented function only once in x milliseconds
+
+       
+
+       //  THE PURPOSE OF THE newasteroid() is to return an element which is of the same data type of roids[]
+
+        function newasteroid( x, y)      // cooridnates of the postion of asteroid is passed.
+        {   var x,y,xv,yv,r,a;
+            var roid
+            {  x : x;
+               y : y;
+               xv : Math.random() * ROIDS_SPD /FPS * (Math.random()<0.5? 1: -1);  //velocity of asteroid along x direction,with randomness in direction along either positive or negative x
+               yv :  Math.random() * ROIDS_SPD /FPS * (Math.random()<0.5? 1: -1);  //velocity of asteroid along y direction,with randomness in direction along either positive or negative x
+                r : ROIDS_SIZE /2;
+                a : Math.random() * Math.PI *2 ;// In radians
+
+            }
+          return roid
+        }
+
+
+
+
+        function update() {
+            //draw space
+
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canv.width, canv.height);
+
+            //***********************THRUSTING OF SHIP *********************************
+
+            if(ship.thrusting)
+            {    
+                //accelerate the ship
+                ship.thrust.x += SHIP_THRUST * Math.cos(ship.a) /FPS;
+                ship.thrust.y -= SHIP_THRUST * Math.sin(ship.a) /FPS;
+
+                // draw the thruster
+                    ctx.fillStyle = "red";
+                    ctx.strokeStyle = "yellow";
+                    ctx.lineWidth = SHIP_SIZE / 10;
+                    ctx.beginPath();
+                    ctx.moveTo( // rear left
+                        ship.x - ship.r * (2 / 3 * Math.cos(ship.a) + 0.5 * Math.sin(ship.a)),
+                        ship.y + ship.r * (2 / 3 * Math.sin(ship.a) - 0.5 * Math.cos(ship.a))
+                    );
+                    ctx.lineTo( // rear centre (behind the ship)
+                        ship.x - ship.r * 5 / 3 * Math.cos(ship.a),
+                        ship.y + ship.r * 5 / 3 * Math.sin(ship.a)
+                    );
+                    ctx.lineTo( // rear right
+                        ship.x - ship.r * (2 / 3 * Math.cos(ship.a) - 0.5 * Math.sin(ship.a)),
+                        ship.y + ship.r * (2 / 3 * Math.sin(ship.a) + 0.5 * Math.cos(ship.a))
+                    );
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+
+            }
+
+            //*****************  FRICTION **********************************
+
+            else
+            {
+                ship.thrust.x -= FRICTION* ship.thrust.x/FPS ;
+                ship.thrust.y -= FRICTION* ship.thrust.y/FPS;
+
+
+            }
+            
+
+            //***********************DRAWING OF TRIANGULAR SHIP*************************
+       
+            ctx.strokeStyle="white";
+            ctx.lineWidth= SHIP_SIZE/20;
+            ctx.beginPath();
+
+            ctx.moveTo( //nose of the ship
+
+            ship.x+ ship.r * 4/3* Math.cos(ship.a),
+            ship.y- ship.r * 4/3* Math.sin(ship.a)
+
+            );
+
+            ctx.lineTo( //rear left
+
+             ship.x - ship.r * (2/3* Math.cos(ship.a)+ Math.sin(ship.a)) ,
+             ship.y + ship.r * (2/3* Math.sin(ship.a)- Math.cos(ship.a))
+
+            );
+
+            ctx.lineTo( //rear left
+
+             ship.x - ship.r * (2/3*Math.cos(ship.a)- Math.sin(ship.a)) ,
+             ship.y + ship.r * (2/3*Math.sin(ship.a)+ Math.cos(ship.a))
+
+            );
+            
+            ctx.closePath();
+          //********* SHIP DRAWING OVER ****************************************************
+          
+
+          //*************************    ASTEROIDS DRAWING **********************************************
+
+          ctx.strokeStyle= " Red";
+          ctx.lineWidth = SHIP_SIZE/20;
+          var x,y,r,a,vert;
+
+          for( var i=0; i< roids.length; i++)                       //roids.length is the length of the roids[] array
+          {
+                //retreive asteroids' properties
+
+                x= roids[i].x;
+                y=  roids[i].y;
+                r= roids[i].r;
+                a= roids[i].a;
+                vert= roids[i].vert;
+
+                //draw the path
+                
+                ctx.save();     //saving the original origin so that after translating to a new origin ,the older origins can be restored
+                ctx.context.translate(x, y);  //shifting origin to (x,y)
+                ctx.beginPath();
+                ctx.moveTo( r,0) ;
+
+                for( var j=1; j< vert; j++)
+                  {  
+                    ctx.lineTo( r* Math.cos(a*j), r*Math.sin(a*j));
+
+                  }
+
+                ctx.closePath()  ;
+                ctx.restore();
+
+                
+
+
+ 
+          }
+            
+            
+            //centre dot for tracking centroid of ship
+
+            ctx.fillStyle= "red";
+            ctx.fillRect(ship.x-1,ship.y-1,2,2);
+            
+            ctx.stroke();
+
+           //**************   ROTATION OF SHIP *********************************************
+
+           ship.a+= ship.rot;
+
+           //***************  MOVING OF SHIP *********************************************
+
+           ship.x += ship.thrust.x;
+           ship.y += ship.thrust.y;
+
+
+           //******************* GOING OUT OF SCREEN **********************************************
+
+           if( (ship.x + ship.r) < 0)                //left extreme of screen
+           {
+              ship.x= gamecanvas.width + ship.r;
+
+           }
+
+           else if ( ship.x> (gamecanvas.width + ship.r) )    //right extreme of screen
+           {
+               ship.x = 0- ship.r ;
+
+           }
+
+           if ( (ship.y +ship.r) <0)                     //top extreme of screen
+           {
+               ship.y = gamecanvas.height+ ship.r;
+           }
+
+           else if (ship.y> (gamecanvas.height+ ship.r))      // bottom extreme of screen
+
+           {
+               ship.y= 0 - ship.r ;
+
+           }
+
+
+            
+
+        }
+
+
+
+
+
+
+
+
+    </script>
+
+</body>
+
+
+
+
+
+</html>
