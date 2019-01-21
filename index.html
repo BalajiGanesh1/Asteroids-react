@@ -69,10 +69,8 @@
 
         //Setting up of  asteroids
 
-        var roids =[];                   //array of asteroids
-        createAsteroidBelt();
-
-
+                           //array of asteroids
+    var roids= createAsteroidBelt();
 
         //setting up event handlers
 
@@ -91,22 +89,23 @@
         setInterval(update, 1000/FPS);
 
         //*********************      THE ENTIRE STOCK OF ASTEROIDS IS CONTROLLED BY THE FOLLOWING FUNCTION                    *********************************************
+        
+        
         function createAsteroidBelt()
-        {
-             roids =[];   //emptying the asteroids array
+        {     roids=[];
+              //emptying the asteroids array
              var x,y;
              for ( var i=0 ; i<ROIDS_NUM; i++)
               {    
                   x= Math.floor(Math.random() * canv.width);      //NOTE: Math.random() gives a random value between 0 and 1.Math.floor approximates downwards to the nearest integer
                   y= Math.floor( Math.random()* canv.height);
+            
+                  
                   roids.push(newasteroid(x,y));         /*push is an inbuilt mehod inside every array.
                                                       it is used to add a new element of the ame data type to the end of the array*/
-
-              }
-
-        }
-
-
+          }
+return roids;
+        } 
 
         function keyDown( /*keyboard event*/ ev )
         {  
@@ -178,24 +177,25 @@
 
        //  THE PURPOSE OF THE newasteroid() is to return an element which is of the same data type of roids[]
 
+        
         function newasteroid( x, y)      // cooridnates of the postion of asteroid is passed.
-        {   var x,y,xv,yv,r,a;
-            var roid
-            {  x : x;
-               y : y;
-               xv : Math.random() * ROIDS_SPD /FPS * (Math.random()<0.5? 1: -1);  //velocity of asteroid along x direction,with randomness in direction along either positive or negative x
-               yv :  Math.random() * ROIDS_SPD /FPS * (Math.random()<0.5? 1: -1);  //velocity of asteroid along y direction,with randomness in direction along either positive or negative x
-                r : ROIDS_SIZE /2;
-                a : Math.random() * Math.PI *2 ;// In radians
+        {   var x,y,xv,yv,r,a,vert;
+            var roid=
+            {  x : x,
+               y : y,
+               xv : Math.random() * ROIDS_SPD /FPS * (Math.random()<0.5? 1: -1) , //velocity of asteroid along x direction,with randomness in direction along either positive or negative x
+               yv :  Math.random() * ROIDS_SPD /FPS * (Math.random()<0.5? 1: -1) ,//velocity of asteroid along y direction,with randomness in direction along either positive or negative x
+                r : ROIDS_SIZE /2,
+                a : Math.random() * Math.PI *2 ,// In radians
+               vert: 2*Math.PI /a,
 
-            }
+            };
           return roid
         }
 
-
-
-
         function update() {
+            
+    
             //draw space
 
             ctx.fillStyle = "black";
@@ -245,7 +245,7 @@
             
 
             //***********************DRAWING OF TRIANGULAR SHIP*************************
-       
+       {
             ctx.strokeStyle="white";
             ctx.lineWidth= SHIP_SIZE/20;
             ctx.beginPath();
@@ -274,7 +274,8 @@
             ctx.closePath();
           //********* SHIP DRAWING OVER ****************************************************
           
-
+       }
+           
           //*************************    ASTEROIDS DRAWING **********************************************
 
           ctx.strokeStyle= " Red";
@@ -294,7 +295,7 @@
                 //draw the path
                 
                 ctx.save();     //saving the original origin so that after translating to a new origin ,the older origins can be restored
-                ctx.context.translate(x, y);  //shifting origin to (x,y)
+                ctx.translate(x, y);  //shifting origin to (x,y)
                 ctx.beginPath();
                 ctx.moveTo( r,0) ;
 
