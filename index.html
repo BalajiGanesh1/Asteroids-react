@@ -4,12 +4,16 @@
 <head>
     <meta charset="utf-8">
     <title> Asteroids</title>
+    <link rel="stylesheet" type="text/css" href="main.css">
     <style> </style>
 
 </head>
 
 
 <body>
+    
+    <p id= "Gameover"></p>
+    
     <canvas id="gamecanvas" width="700" height="500"> </canvas>
     <!-- Creating a game space of canvas type. this Canvas tag is nothing but a container for all the graphics portions of the games,like images,
         texts etc. The actaul drawing of images and objects is implemented via javascript-->
@@ -25,6 +29,9 @@
         const ROIDS_NUM = 3 ;   //the number of asteroids being 3 in the beginning of the game
         const ROIDS_SIZE = 100;
         const ROIDS_SPD = 50;
+        const ROIDS_JAG = 0.4;  
+        
+        var SHIP_BOUNDING =0;
         //* @type{HTMLCanvasElement}   
 
         /* NOTE: HTMLCanvasElement is used to provide all the methods and properies of html5 to the canvas elements and manipulate the canvas elements 
@@ -42,6 +49,13 @@
         /* NOTE: getContext is a function which returns an object(i.e its reference).this object contains all mehods and properties 
         for drawing on the canvas.when "2d" is specified , the methods responsible for drawing lines,text,boxes and functions is called.this object which is 
         being returned is called as renderingcontext*/
+        
+        function distbtwpoints (x1,y1,x2,y2)
+        {
+            
+            return Math.sqrt((pow((y2-y1),2)- pow((x2-x1),2)));
+              
+        }
 
 
         var ship =
@@ -82,7 +96,27 @@
         //is an event in which the user releases the key.Once the event has happened, the function parametrised is called
 
 
-
+     function exploded()
+        
+        {
+            
+        
+            SHIP_BOUNDING=1; 
+            var message= document.getElementById("Gameover").innerHTML=" GAME  OVER BUDDY!";
+            
+            
+            var Button= document.createElement("button");
+            
+            Button.innerHTML="Restart";
+            
+            var body= document.getElementsByTagName("body")[0];
+            body.appendChild(Button);
+            
+            Button.addEventListener("click",update);
+            SHIP_BOUNDING=0;      
+            
+            
+        }
 
         //SET THE GAME LOOP
 
@@ -157,6 +191,8 @@ return roids;
 
 
                  break;
+                     
+                
 
 
 
@@ -188,6 +224,7 @@ return roids;
                 r : ROIDS_SIZE /2,
                 a : Math.random() * Math.PI *2 ,// In radians
                vert: 2*Math.PI /a,
+               
 
             };
           return roid
@@ -272,18 +309,24 @@ return roids;
             );
             
             ctx.closePath();
+            ctx.stroke();
           //********* SHIP DRAWING OVER ****************************************************
           
        }
            
           //*************************    ASTEROIDS DRAWING **********************************************
 
-          ctx.strokeStyle= " Red";
-          ctx.lineWidth = SHIP_SIZE/20;
-          var x,y,r,a,vert;
-
+         
+           
+        
+            ctx.strokeStyle= " Red";
+            ctx.lineWidth = SHIP_SIZE/20;
+            var x,y,r,a,vert;
+           
           for( var i=0; i< roids.length; i++)                       //roids.length is the length of the roids[] array
-          {
+          {      
+              
+             
                 //retreive asteroids' properties
 
                 x= roids[i].x;
@@ -291,36 +334,101 @@ return roids;
                 r= roids[i].r;
                 a= roids[i].a;
                 vert= roids[i].vert;
+            
+              //************************* DRAWING ASTEROIDS *************************************************
+              
+              
+               // Creating images inside the circular asteroid elements
+              
+              /*
+               * 
+               * 
+               * 
+               * 
+               * 
+               * 
+               * 
+               * 
+               * 
+               */
+              
+              
 
-                //draw the path
+              //***** DRAWING THE CIRCULAR ASTEROID ********
+              ctx.beginPath();
+              
+              ctx.arc(x,y,r,0,Math.PI*2);
+              ctx.stroke();
+              
+              // Moving asteroids
+              
+               roids[i].x+= roids[i].xv;
+              roids[i].y += roids[i].yv;
+              
+              //handling edge of screen for asteroids
+              
+              if (roids[i].x < 0 - roids[i].r) {
+                  roids[i].x = canv.width + roids[i].r;
+              } else if (roids[i].x > canv.width + roids[i].r) {
+                  roids[i].x = 0 - roids[i].r
+              }
+              if (roids[i].y < 0 - roids[i].r) {
+                  roids[i].y = canv.height + roids[i].r;
+              } else if (roids[i].y > canv.height + roids[i].r) {
+                  roids[i].y = 0 - roids[i].r
+              }
+              
+            
+
                 
-                ctx.save();     //saving the original origin so that after translating to a new origin ,the older origins can be restored
-                ctx.translate(x, y);  //shifting origin to (x,y)
+           
+                /*
+                
+                //ctx.save();     //saving the original origin so that after translating to a new origin ,the older origins can be restored
+                //ctx.translate(x, y);  //shifting origin to (x,y)
                 ctx.beginPath();
-                ctx.moveTo( r,0) ;
+                ctx.moveTo( x+r,y) ;
 
                 for( var j=1; j< vert; j++)
                   {  
-                    ctx.lineTo( r* Math.cos(a*j), r*Math.sin(a*j));
-
+                      
+                      
+                    ctx.lineTo( (x+r* Math.cos(a*j)),(y+ r*Math.sin(a*j)));
+                      
                   }
+              
+              
 
                 ctx.closePath()  ;
-                ctx.restore();
-
+                //ctx.restore();
+              ctx.stroke();
+                */
                 
+              //****************** COLLISION DETECTION ****************************** ********
+
+              if(distbtwpoints(roids[i].x, roids[i].y,ship.x,ship.y)< (ship.r + roids[i].r) )
+                  {
+                      
+                     
+                      exploded();
+                      
+                      
+                  }
 
 
  
           }
-            
-            
+  
+  
+         
             //centre dot for tracking centroid of ship
-
+          {
             ctx.fillStyle= "red";
             ctx.fillRect(ship.x-1,ship.y-1,2,2);
             
             ctx.stroke();
+            
+}
 
            //**************   ROTATION OF SHIP *********************************************
 
@@ -330,10 +438,14 @@ return roids;
 
            ship.x += ship.thrust.x;
            ship.y += ship.thrust.y;
-
+            
+           
+                
 
            //******************* GOING OUT OF SCREEN **********************************************
-
+      
+            //***************************1. FOR SHIP *************************************************
+           {    
            if( (ship.x + ship.r) < 0)                //left extreme of screen
            {
               ship.x= gamecanvas.width + ship.r;
@@ -357,6 +469,9 @@ return roids;
                ship.y= 0 - ship.r ;
 
            }
+            
+        }
+
 
 
             
