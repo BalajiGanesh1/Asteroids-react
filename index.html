@@ -22,6 +22,7 @@
     <script>
         //**********************THE GAME JAVASCRIPT BEGINS**********************************************************************************************
         const FPS = 30;
+        
 
         const SHIP_SIZE = 30; //ship height in pixels
         const TURN_SPEED = 360; // TURNSPEED in degrees per second
@@ -184,6 +185,8 @@
 
       function keydownEnter(/*keyboardevent*/ ev)  
         {
+            
+            //console.log(ev.keyCode);
             if(ev.keyCode == 13)
                 callback();
             
@@ -228,6 +231,18 @@
                 Button.addEventListener("click", hi());
 
               */ 
+            
+        }
+        
+     function drawlaser()
+        {
+            
+        }
+            
+        }
+        
+     function eraselaser()
+        {
             
         }
 
@@ -276,6 +291,10 @@ return roids;
 
 
                  break;
+                     
+                 
+                 case 32:
+                     drawlaser();
 
 
 
@@ -305,6 +324,9 @@ return roids;
 
                  break;
                      
+                 case 32:
+                     eraselaser();
+                     
                 
 
 
@@ -325,6 +347,9 @@ return roids;
        
 
        //  THE PURPOSE OF THE newasteroid() is to return an element which is of the same data type of roids[]
+        
+        
+       
 
         
         function newasteroid( x, y)      // cooridnates of the postion of asteroid is passed.
@@ -561,6 +586,11 @@ return roids;
            }
             
         }
+            
+            
+            //*************************  LASER BEAM RELEASE FROM SHIP *********************************
+            
+            
             
             
             // *******************  GAME   OVER   MESSAGE *********************************
