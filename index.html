@@ -14,7 +14,7 @@
     
    
     
-    <canvas id="gamecanvas" width="700" height="500"> </canvas>
+    <canvas id="gamecanvas" width="900" height="700"> </canvas>
     <!-- Creating a game space of canvas type. this Canvas tag is nothing but a container for all the graphics portions of the games,like images,
         texts etc. The actaul drawing of images and objects is implemented via javascript-->
         <p id= "Gameover"></p>
@@ -188,12 +188,14 @@
             
             //console.log(ev.keyCode);
             if(ev.keyCode == 13)
+            {
                 callback();
-            
+                
+            }
         }
         
         
-        //hello all
+        
     
 
      function exploded()
@@ -236,15 +238,117 @@
         
      function drawlaser()
         {
+            //tip of ship
+            {
+                var tipx= ship.x+ ship.r * 4/3* Math.cos(ship.a);
+                var tipy= ship.y- ship.r * 4/3* Math.sin(ship.a);
+            }
             
-        }
             
+            
+            
+            //destination of laser beam
+            
+                {  
+                    var xend, yend;
+                    
+                    var m= (tipy-ship.y)/(tipx- ship.x);
+                    var c=  (ship.y- m*ship.x);
+                    
+                    
+                    if(ship.a>=0 && ship.a<=(Math.PI/4) )
+
+                    {  xend= canv.width;
+                       yend= m*xend +c;
+                     
+                       console.log(xend,yend);
+
+                    }
+
+                    else if( ship.a> (Math.PI/4) && ship.a<=(3*Math.PI/4))
+                        {  
+                            if(ship.a != Math.PI/2)
+                            { yend=0;
+                            xend= -c/m;
+                             console.log(xend,yend);
+                            }
+                            
+                            else
+                                
+                                {
+                                    yend=0;
+                                    xend= ship.x;
+                                }
+                            
+
+
+
+                        }
+
+                    else if( ship.a >(3*Math.PI/4)&& ship.a<= (5*Math.PI/4))
+                        {  
+                           
+                                 xend=- canv.width;
+                                 yend= m*xend +c;
+                                 console.log(xend,yend);
+                            
+                            
+                            
+                           
+
+
+                        }
+
+
+                    else if( ship.a >(5*Math.PI/4) && ship.a<= (7*Math.PI/4))
+                        {
+                           
+                             if(ship.a != 1.5*Math.PI)
+                            {
+                                yend= canv.height;
+                                xend = (yend-c)/m;
+                                console.log(xend,yend);
+                                
+                            }
+                            
+                            else
+                                {
+                                     yend=canv.height;
+                                    xend= ship.x;
+                                    
+                                    
+                                }
+
+
+
+                        }
+
+                   else if( ship.a >(7*Math.PI/4) && ship.a< (8*Math.PI/4) )
+                       {
+                            console.log(xend,yend);
+                             
+                           xend= canv.width;
+                              yend= m*xend +c;
+                           // console.log(xend,yend);
+
+                       }
+                
+                
+            }
+            
+            //drawing
+            
+            ctx.beginPath();
+            ctx.moveTo(tipx,tipy);
+            ctx.lineTo(xend,yend);
+            ctx. lineWidth=15;
+            ctx.strokeStyle="yellow";
+            ctx.stroke();
+          
+        
         }
         
-     function eraselaser()
-        {
-            
-        }
+    
 
         //SET THE GAME LOOP
 
@@ -292,9 +396,13 @@ return roids;
 
                  break;
                      
-                 
                  case 32:
+                     
                      drawlaser();
+                     break;
+                     
+                 
+                 
 
 
 
@@ -324,9 +432,7 @@ return roids;
 
                  break;
                      
-                 case 32:
-                     eraselaser();
-                     
+                 
                 
 
 
@@ -336,6 +442,9 @@ return roids;
 
 
           }
+        
+        
+
 
 
         /*NOTE:  setInterval and setTimeout are two methods of the window object in javascript.However,these methods can be called without 
@@ -541,13 +650,14 @@ return roids;
             ctx.fillRect(ship.x-1,ship.y-1,2,2);
             
             ctx.stroke();
-            
-}
+          }
 
             if(SHIP_COLLIDED==0)
            //**************   ROTATION OF SHIP *********************************************
         {
            ship.a+= ship.rot;
+            
+            
 
            //***************  MOVING OF SHIP *********************************************
 
@@ -590,8 +700,7 @@ return roids;
             
             //*************************  LASER BEAM RELEASE FROM SHIP *********************************
             
-            
-            
+        
             
             // *******************  GAME   OVER   MESSAGE *********************************
             
