@@ -6,32 +6,35 @@
     <title> Asteroids</title>
     <link rel="stylesheet" type="text/css" href="main.css">
     <style> </style>
-
+    
+  
 </head>
 
 
 <body>
     
    
+    <div id="like_button_container"></div>
+
     
-    <canvas id="gamecanvas" width="900" height="700"> </canvas>
-    <!-- Creating a game space of canvas type. this Canvas tag is nothing but a container for all the graphics portions of the games,like images,
-        texts etc. The actaul drawing of images and objects is implemented via javascript-->
+    <canvas id="gamecanvas" width="900" height="700">
+    </canvas>
+    <!-- Creating a game space of canvas type. this Canvas tag is nothing but a container for all the graphics portions of the games,like images, texts etc. The actaul drawing of images and objects is implemented via javascript-->
         <p id= "Gameover"></p>
     
     <script>
         //**********************THE GAME JAVASCRIPT BEGINS**********************************************************************************************
-        const FPS = 30;
+        const FPS = 60;
         
 
-        const SHIP_SIZE = 30; //ship height in pixels
+        const SHIP_SIZE = 40; //ship height in pixels
         const TURN_SPEED = 360; // TURNSPEED in degrees per second
         const SHIP_THRUST = 5;   // ACCELERATION of ship in pixels per second(sq)
         const FRICTION = 0.7 ; //Co efficient of friction (not in the exact physical definition though)
         const ROIDS_NUM = 3 ;   //the number of asteroids being 3 in the beginning of the game
-        const ROIDS_SIZE = 100;
+        const ROIDS_SIZE = 200;
         const ROIDS_SPD = 50;
-        const ROIDS_JAG = 0.4;  
+       
         
         var SHIP_BOUNDING =0;
         var SHIP_COLLIDED =0;
@@ -268,9 +271,9 @@
                     else if( ship.a> (Math.PI/4) && ship.a<=(3*Math.PI/4))
                         {  
                             if(ship.a != Math.PI/2)
-                            { yend=0;
-                            xend= -c/m;
-                             console.log(xend,yend);
+                            {   yend=0;
+                                xend= -c/m;
+                                console.log(xend,yend);
                             }
                             
                             else
@@ -315,7 +318,7 @@
                                 {
                                      yend=canv.height;
                                     xend= ship.x;
-                                    
+                                    console.log(xend,yend);
                                     
                                 }
 
@@ -325,14 +328,15 @@
 
                    else if( ship.a >(7*Math.PI/4) && ship.a< (8*Math.PI/4) )
                        {
-                            console.log(xend,yend);
+                            //console.log(xend,yend);
                              
                            xend= canv.width;
+                           
                               yend= m*xend +c;
-                           // console.log(xend,yend);
+                           //console.log(xend,yend);
 
                        }
-                
+            
                 
             }
             
@@ -344,10 +348,9 @@
             ctx. lineWidth=15;
             ctx.strokeStyle="yellow";
             ctx.stroke();
-          
-        
+        console.log('Fire',xend,yend); 
         }
-        
+    
     
 
         //SET THE GAME LOOP
@@ -396,7 +399,7 @@ return roids;
 
                  break;
                      
-                 case 32:
+                 case 32:    //space bar for shooting laser
                      
                      drawlaser();
                      break;
@@ -576,8 +579,7 @@ return roids;
               
 
               //***** DRAWING THE CIRCULAR ASTEROID ********
-              ctx.beginPath();
-              
+              ctx.beginPath(); 
               ctx.arc(x,y,r,0,Math.PI*2);
               ctx.stroke();
               
@@ -591,12 +593,12 @@ return roids;
               if (roids[i].x < 0 - roids[i].r) {
                   roids[i].x = canv.width + roids[i].r;
               } else if (roids[i].x > canv.width + roids[i].r) {
-                  roids[i].x = 0 - roids[i].r
+                  roids[i].x = 0 - roids[i].r;
               }
               if (roids[i].y < 0 - roids[i].r) {
                   roids[i].y = canv.height + roids[i].r;
               } else if (roids[i].y > canv.height + roids[i].r) {
-                  roids[i].y = 0 - roids[i].r
+                  roids[i].y = 0 - roids[i].r;
               }
               
             
@@ -731,6 +733,16 @@ return roids;
 
 
     </script>
+    
+    
+    <!-- WE ARE LOADING THE REACT HERE IN THE FOLLOWING 2 LINES-----------------> 
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    
+    <!-- Load our React component. -->
+    <script src="like_button.js"></script>
+    <script src="Asteroidsshotdetector.js"></script>
+
 
 </body>
 
