@@ -13,7 +13,7 @@
 
 <body>
     
-   
+  
     <div id="like_button_container"></div>
 
     
@@ -21,7 +21,7 @@
     </canvas>
     <!-- Creating a game space of canvas type. this Canvas tag is nothing but a container for all the graphics portions of the games,like images, texts etc. The actaul drawing of images and objects is implemented via javascript-->
         <p id= "Gameover"></p>
-    
+        <p id= "portions">kgdughybfx</p>
     <script>
         //**********************THE GAME JAVASCRIPT BEGINS**********************************************************************************************
         const FPS = 60;
@@ -34,7 +34,8 @@
         const ROIDS_NUM = 3 ;   //the number of asteroids being 3 in the beginning of the game
         const ROIDS_SIZE = 200;
         const ROIDS_SPD = 50;
-       
+        var SCORE = 0;
+       const BULLET_SPEED = 500;
         
         var SHIP_BOUNDING =0;
         var SHIP_COLLIDED =0;
@@ -108,7 +109,10 @@
             //Reinitialising ship to default values
             
            
-               {       
+            var ship =new ship;  
+            
+            
+            /* {       
                      ship.x= canv.width/2;
 
                      ship.y= canv.height/ 2;
@@ -124,7 +128,7 @@
                      ship.thrust .x= 0;
                      ship.thrust.y=0;        
         
-               }
+               }*/
             
             //Reinitialising SHIP_COLLIDED to 0
             
@@ -165,6 +169,10 @@
                 x: 0 ,
                 y: 0
             }
+            
+            canshoot: true,
+            
+            bullets[]
 
 
         }
@@ -239,8 +247,8 @@
             
         }
         
-     function drawlaser()
-        {
+      /* function drawlaser()
+       {
             //tip of ship
             {
                 var tipx= ship.x+ ship.r * 4/3* Math.cos(ship.a);
@@ -259,7 +267,7 @@
                     var c=  (ship.y- m*ship.x);
                     
                     
-                    if(ship.a>=0 && ship.a<=(Math.PI/4) )
+                    if((ship.a>=0 && ship.a<=(Math.PI/4) ) || ( ship.a >(7*Math.PI/4) && ship.a< (8*Math.PI/4) ))
 
                     {  xend= canv.width;
                        yend= m*xend +c;
@@ -326,16 +334,7 @@
 
                         }
 
-                   else if( ship.a >(7*Math.PI/4) && ship.a< (8*Math.PI/4) )
-                       {
-                            //console.log(xend,yend);
-                             
-                           xend= canv.width;
-                           
-                              yend= m*xend +c;
-                           //console.log(xend,yend);
-
-                       }
+                  
             
                 
             }
@@ -349,8 +348,30 @@
             ctx.strokeStyle="yellow";
             ctx.stroke();
         console.log('Fire',xend,yend); 
+        } */
+        
+        function drawBullet ()
+        {
+           //tip of ship
+            {
+                var tipx= ship.x+ ship.r * 4/3* Math.cos(ship.a);
+                var tipy= ship.y- ship.r * 4/3* Math.sin(ship.a);
+            }
+            
+            ctx.strokeStyle("yellow");
+            ctx.beginPath(); 
+            ctx.arc(tipx,tipy,10,0,Math.PI*2);
+            ctx.stroke();
+            
         }
-    
+        
+        
+       /* function asteroidsshotdetect(x,y)
+        {
+            
+            Math.abs()
+        }
+    */
     
 
         //SET THE GAME LOOP
@@ -401,7 +422,7 @@ return roids;
                      
                  case 32:    //space bar for shooting laser
                      
-                     drawlaser();
+                     drawBullet();
                      break;
                      
                  
