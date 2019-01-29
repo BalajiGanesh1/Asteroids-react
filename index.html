@@ -15,13 +15,14 @@
     
   
     <div id="like_button_container"></div>
-
+     
     
     <canvas id="gamecanvas" width="900" height="700">
     </canvas>
     <!-- Creating a game space of canvas type. this Canvas tag is nothing but a container for all the graphics portions of the games,like images, texts etc. The actaul drawing of images and objects is implemented via javascript-->
         <p id= "Gameover"></p>
-        <p id= "portions">kgdughybfx</p>
+     
+     
     <script>
         //**********************THE GAME JAVASCRIPT BEGINS**********************************************************************************************
         const FPS = 60;
@@ -31,14 +32,15 @@
         const TURN_SPEED = 360; // TURNSPEED in degrees per second
         const SHIP_THRUST = 5;   // ACCELERATION of ship in pixels per second(sq)
         const FRICTION = 0.7 ; //Co efficient of friction (not in the exact physical definition though)
-        const ROIDS_NUM = 3 ;   //the number of asteroids being 3 in the beginning of the game
+        const ROIDS_NUM = 5;   //the number of asteroids being 5 in the beginning of the game
         const ROIDS_SIZE = 200;
-        const ROIDS_SPD = 50;
+        const ROIDS_SPD = 200;
         var SCORE = 0;
        const BULLET_SPEED = 500;
         
         var SHIP_BOUNDING =0;
         var SHIP_COLLIDED =0;
+        var HIGHEST_SCORE=0;
         //* @type{HTMLCanvasElement}   
 
         /* NOTE: HTMLCanvasElement is used to provide all the methods and properies of html5 to the canvas elements and manipulate the canvas elements 
@@ -109,10 +111,10 @@
             //Reinitialising ship to default values
             
            
-            var ship =new ship;  
+             
             
-            
-            /* {       
+                {
+                  
                      ship.x= canv.width/2;
 
                      ship.y= canv.height/ 2;
@@ -126,9 +128,12 @@
                      ship.thrusting = false;
 
                      ship.thrust .x= 0;
-                     ship.thrust.y=0;        
+                     ship.thrust.y=0;   
+                    
+                     ship.canshoot = true;
+                     ship.bullets= [];
         
-               }*/
+               }
             
             //Reinitialising SHIP_COLLIDED to 0
             
@@ -142,7 +147,15 @@
             //also should set score to zero
             
             {
+                if(SCORE > HIGHEST_SCORE)
+                {  
+                    localStorage.setItem( "highscore", SCORE) ;
+                }
                 
+                HIGHEST_SCORE= localStorage.getItem("highscore");
+                console.log(HIGHEST_SCORE+"IS THE HIGHEST SCORE");
+                
+                SCORE=0;
                 
             }
            
@@ -157,6 +170,10 @@
             y: canv.height / 2,
 
             r: SHIP_SIZE / 2,
+            
+            canshoot : true,
+            
+            bullets: [],
 
             a: 90 / 180 * Math.PI , // convert to radians
 
@@ -170,13 +187,43 @@
                 y: 0
             }
             
-            canshoot: true,
             
-            bullets[]
 
 
         }
        
+       
+       //************************** BULLETS SHOOTING FROM SHIP **************************************
+      function shootbullet()
+        
+        {
+           //console.log("shhotbullet is called");
+       if(ship.canshoot== true && SHIP_COLLIDED==0)
+       {   
+           //console.log("gone inside if of shootbullet()");
+            
+              ship.bullets.push(           //bullet added to the arsenel(max of 10 only)
+               {
+                   x: ship.x + ship.r * 4/3* Math.cos(ship.a),
+                   y: ship.y - ship.r * 4/3* Math.sin(ship.a),
+                 
+                  xv: BULLET_SPEED *Math.cos(ship.a)/FPS,
+                  yv: -BULLET_SPEED* Math.sin(ship.a)/FPS,
+                   
+                  
+               }  )
+            
+            //moving the bullet
+            
+            
+  
+           
+        ship.canshoot= false;
+       //    console.log(ship.bullets);
+       }
+            
+        }
+
        
 
 
@@ -350,18 +397,15 @@
         console.log('Fire',xend,yend); 
         } */
         
-        function drawBullet ()
+        function drawBullet (x,y)
         {
            //tip of ship
-            {
-                var tipx= ship.x+ ship.r * 4/3* Math.cos(ship.a);
-                var tipy= ship.y- ship.r * 4/3* Math.sin(ship.a);
-            }
             
-            ctx.strokeStyle("yellow");
+            
+            ctx.fillStyle="yellow";
             ctx.beginPath(); 
-            ctx.arc(tipx,tipy,10,0,Math.PI*2);
-            ctx.stroke();
+            ctx.arc(x,y,SHIP_SIZE/15,0,Math.PI*2,false);
+            ctx.fill();
             
         }
         
@@ -422,7 +466,7 @@ return roids;
                      
                  case 32:    //space bar for shooting laser
                      
-                     drawBullet();
+                     shootbullet();
                      break;
                      
                  
@@ -456,6 +500,14 @@ return roids;
 
                  break;
                      
+                 case 32:    //space bar for shooting laser
+
+                     {  
+                         ship.canshoot= true;
+                     
+                         break;
+                     }
+                     
                  
                 
 
@@ -483,18 +535,24 @@ return roids;
         
         
        
-
+        
         
         function newasteroid( x, y)      // cooridnates of the postion of asteroid is passed.
-        {   var x,y,xv,yv,r,a,vert;
+        {   var x,y,xv,yv,r,a,vert,index;
+         
+             var AST_SIZES =[ROIDS_SIZE,ROIDS_SIZE/2,ROIDS_SIZE/3,ROIDS_SIZE/4,ROIDS_SIZE/5,ROIDS_SIZE/6,ROIDS_SIZE/7,ROIDS_SIZE/8,ROIDS_SIZE/10 ];
+             index= Math.floor(Math.random()*10);
+
+         console.log(index+"index");
+
             var roid=
             {  x : x,
                y : y,
                xv : Math.random() * ROIDS_SPD /FPS * (Math.random()<0.5? 1: -1) , //velocity of asteroid along x direction,with randomness in direction along either positive or negative x
                yv :  Math.random() * ROIDS_SPD /FPS * (Math.random()<0.5? 1: -1) ,//velocity of asteroid along y direction,with randomness in direction along either positive or negative x
-                r : ROIDS_SIZE /2,
-                a : Math.random() * Math.PI *2 ,// In radians
-               vert: 2*Math.PI /a,
+                
+                r : AST_SIZES [index] 
+               
                
 
             };
@@ -648,7 +706,7 @@ return roids;
               ctx.stroke();
                 */
                 
-              //****************** COLLISION DETECTION ****************************** ********
+              //****************** COLLISION DETECTION of SHIP WITH ASTEROID****************************** ********
 
               if(distbtwpoints(roids[i].x, roids[i].y,ship.x,ship.y)< (ship.r + roids[i].r) )
                 {
@@ -664,8 +722,53 @@ return roids;
 
  
           }
+            
+            //******************* COLLISION DETECTION OF BULLET WITH ASTEROID **************************************
+            
+            {  var ax,ay,ar,bx,by,br;
+             
+               for(var i= roids.length-1;i>=0; i--)
+                   {  //retrieving asteroids' properties
+                       ax= roids[i].x;
+                       ay= roids[i].y;
+                       ar= roids[i].r;
+                       
+                       //console.log(i,"number asteroid props receieved");
+                        
+                       // checking with each bullet shot
+                       
+                       for(var j=ship.bullets.length-1;j>=0;j--)
+                       { //retrieving bullets' properties
+                           
+                           bx= ship.bullets[j].x;
+                           by= ship.bullets[j].y;
+                           br= ship.bullets[j].r;
+                           
+                           //console.log(j,"number bullet props receieved");
+                           
+                           if(distbtwpoints(bx,by,ax,ay)<(ar))
+                               {   
+                                   console.log("bullet collided");
+                                   
+                                       ship.bullets.splice(j,1);
+                                       roids.splice(i,1);
+                                   
+                                       
+                                      createAsteroidBelt();
+                                      SCORE+= 5;
+                                      console.log(SCORE);
+                                   
+                                   
+                               }
+                           
+                           
+                           
+                       }
+                       
+                       
+                   }
   
-  
+            }
          
             //centre dot for tracking centroid of ship
           {
@@ -720,8 +823,44 @@ return roids;
             
         }
             
+            //*************************** CALLING TO DRAW THE BULLETS ********************
+            
+            {
+                
+                for(var i=0;i< ship.bullets.length;i++)
+                    {
+                        
+                        drawBullet(ship.bullets[i].x,ship.bullets[i].y);
+                        
+                    }
+                
+            }
+            
+            
+            //***********  MOVING THE BULLETS ***********************************
+            
+            {
+                
+                for(var i=0;i< ship.bullets.length;i++)
+                {
+                  ship.bullets[i].x+= ship.bullets[i].xv;
+                  ship.bullets[i].y += ship.bullets[i].yv;
+                
+                }
+                
+            }
             
             //*************************  LASER BEAM RELEASE FROM SHIP *********************************
+            
+            
+            //************************  SCORE DISPLAY ****************************************************
+            
+            ctx.font =" 20px Arial";
+            ctx.fillstyle ="White";
+            ctx.textAlign="center";
+            ctx.fillText("SCORE ",canv.width/1.5,0);
+            
+            
             
         
             
